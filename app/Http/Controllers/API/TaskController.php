@@ -103,6 +103,12 @@ public function store(Request $request)
 
         // Création de la tâche
         $task = tasks::create($input);
+        
+         // Vérification si la tâche est en retard
+         if ($task->due_date < now()) {
+            // Envoi de la notification si la tâche est en retard
+            $task->user->notify(new TaskOverdue($task));
+        }
 
         // Retourner une réponse JSON avec la tâche créée
         return $this->sendResponse(new TaskResource($task), 'Task created successfully.');
